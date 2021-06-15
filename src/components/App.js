@@ -4,12 +4,26 @@ import Order from "./Order";
 import Inventory from "./Inventory";
 import sampleFishes from "../sample-fishes";
 import Fish from "./Fish";
+import base from "../base";
 
 class App extends Component {
   state = {
     fishes: {},
     order: {},
   };
+
+  componentDidMount() {
+    const { params } = this.props.match;
+    this.ref = base.syncState(`${params.storeId}/fishes`, {
+      context: this,
+      state: "fishes",
+    });
+  }
+
+  componentWillUnmount() {
+    base.removeBinding(this.ref)
+  }
+
   addFish = (fish) => {
     // 1. Take a copy of the existing state
     const fishes = { ...this.state.fishes };
@@ -41,7 +55,12 @@ class App extends Component {
           <Header tagline="FRESH SEAFOOD MARKET" />
           <ul className="fishes">
             {Object.keys(this.state.fishes).map((key) => (
-              <Fish key={key} index={key} details={this.state.fishes[key]} addToOrder={this.addToOrder} />
+              <Fish
+                key={key}
+                index={key}
+                details={this.state.fishes[key]}
+                addToOrder={this.addToOrder}
+              />
             ))}
           </ul>
         </div>
